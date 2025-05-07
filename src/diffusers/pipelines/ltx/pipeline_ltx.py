@@ -661,10 +661,13 @@ class LTXPipeline(DiffusionPipeline, FromSingleFileMixin, LTXVideoLoraLoaderMixi
             prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds], dim=0)
             prompt_attention_mask = torch.cat([negative_prompt_attention_mask, prompt_attention_mask], dim=0)
 
-        del self.text_encoder
-        del self.tokenizer
+        e = self.text_encoder
+        del e
+        e = self.tokenizer
+        del e
         gc.collect()
         torch.cuda.empty_cache()
+        print("Deleted encoder")
 
         # 4. Prepare latent variables
         num_channels_latents = self.transformer.config.in_channels
