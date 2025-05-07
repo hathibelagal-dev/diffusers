@@ -661,12 +661,8 @@ class LTXPipeline(DiffusionPipeline, FromSingleFileMixin, LTXVideoLoraLoaderMixi
             prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds], dim=0)
             prompt_attention_mask = torch.cat([negative_prompt_attention_mask, prompt_attention_mask], dim=0)
 
-        e = self.text_encoder
-        e.to("cpu")
-        del e
-        e = self.tokenizer
-        e.to("cpu")
-        del e
+        self.text_encoder = None
+        self.tokenizer = None
         gc.collect()
         torch.cuda.empty_cache()
         print("Deleted encoder")
