@@ -15,6 +15,7 @@
 import inspect
 from typing import Any, Callable, Dict, List, Optional, Union
 
+import gc
 import numpy as np
 import torch
 from transformers import T5EncoderModel, T5TokenizerFast
@@ -659,6 +660,11 @@ class LTXPipeline(DiffusionPipeline, FromSingleFileMixin, LTXVideoLoraLoaderMixi
         if self.do_classifier_free_guidance:
             prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds], dim=0)
             prompt_attention_mask = torch.cat([negative_prompt_attention_mask, prompt_attention_mask], dim=0)
+
+        del self.text_encoder
+        del self.tokenizer
+        gc.collect()
+        torch.cuda.empty_cache()
 
         # 4. Prepare latent variables
         num_channels_latents = self.transformer.config.in_channels
